@@ -18,10 +18,11 @@ Email 			: justas.balcas (at) cern.ch
 @Copyright		: Copyright (C) 2016 California Institute of Technology
 Date			: 2017/09/26
 """
+from __future__ import absolute_import
 import sys
 import pprint
 import importlib
-import Plugins
+from . import Plugins
 from DTNRMLibs.MainUtilities import publishToSiteFE, createDirs
 from DTNRMLibs.MainUtilities import getFullUrl
 from DTNRMLibs.MainUtilities import contentDB

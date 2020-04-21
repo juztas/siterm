@@ -19,6 +19,7 @@ Email 			: justas.balcas (at) cern.ch
 @Copyright		: Copyright (C) 2016 California Institute of Technology
 Date			: 2017/09/26
 """
+from __future__ import print_function
 from tempfile import NamedTemporaryFile
 from SiteFE.PolicyService import policyService as polS
 from SiteFE.PolicyService import stateMachine as stateM
@@ -75,7 +76,7 @@ class frontendDeltaModels(object):
                    'state': out['State'],
                    'reduction': out['ParsedDelta']['reduction'],
                    'addition': out['ParsedDelta']['addition']}
-        print 'Delta was %s. Returning info %s' % (out['State'], outDict)
+        print('Delta was %s. Returning info %s' % (out['State'], outDict))
         if out['State'] in ['accepted']:
             kwargs['http_respond'].ret_201('application/json', kwargs['start_response'],
                                            [('Last-Modified', httpdate(out['UpdateTime'])),
@@ -132,11 +133,11 @@ class frontendDeltaModels(object):
             return getCustomOutMsg(msg='Internal State change approved', exitCode=200)
         else:
             delta = self.getdelta(deltaID, **kwargs)
-            print 'Commit Action for delta %s' % delta
+            print('Commit Action for delta %s' % delta)
             # Now we go directly to commited in case of commit
             if delta['state'] != 'accepted':
                 msg = "Delta    state in the system is not in accepted state. \
                       State on the system: %s. Not allowed to change." % delta['state']
-                print msg
+                print(msg)
                 raise WrongDeltaStatusTransition(msg)
             self.stateM.commit(dbobj, {'uid': deltaID, 'state': 'committing'})

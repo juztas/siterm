@@ -19,6 +19,7 @@ Email 			: justas.balcas (at) cern.ch
 @Copyright		: Copyright (C) 2016 California Institute of Technology
 Date			: 2017/09/26
 """
+from __future__ import print_function
 from DTNRMLibs.MainUtilities import getConfig, getLogger, getStreamLogger
 from DTNRMLibs.MainUtilities import evaldict
 
@@ -30,9 +31,9 @@ def getNodeDictVlans(nodesInfo, hostname, switchName):
     for _, nodeDict in nodesInfo['nodes'].items():
         if nodeDict['hostname'] == hostname:
             for intf, intfDict in nodeDict['NetInfo'].items():
-                print intfDict
+                print(intfDict)
                 if not isinstance(intfDict, dict):
-                    print 'Something is failing on agent. It did not sent dict!'
+                    print('Something is failing on agent. It did not sent dict!')
                     return None, {}
                 if 'switch' in intfDict.keys() and intfDict['switch'] == switchName:
                     return intf, intfDict
@@ -70,7 +71,7 @@ def getinfo(config, logger, nodesInfo=None, site=None):
     for _, nodeDict in nodesInfo.items():
         hostinfo = evaldict(nodeDict['hostinfo'])
         for intfKey, intfDict in hostinfo['NetInfo']["interfaces"].items():
-            print intfKey, intfDict
+            print(intfKey, intfDict)
             breakLoop = False
             for key in ['switch_port', 'switch', 'vlan_range', 'available_bandwidth']:
                 if key not in intfDict.keys():
@@ -91,14 +92,14 @@ def getinfo(config, logger, nodesInfo=None, site=None):
     if config.has_option(site, "l3_routing_map"):
         routingMap = config.get(site, "l3_routing_map")
         output['l3_routing'] = evaldict(routingMap)
-    print output
+    print(output)
     return output
 
 if __name__ == '__main__':
-    print 'WARNING!!!! This should not be used through main call. Only for testing purposes!!!'
+    print('WARNING!!!! This should not be used through main call. Only for testing purposes!!!')
     CONFIG = getConfig()
     COMPONENT = 'LookUpService'
     LOGGER = getStreamLogger()
     for sitename in CONFIG.get('general', 'sites').split(','):
-        print 'Working on %s' % sitename
+        print('Working on %s' % sitename)
         getinfo(CONFIG, LOGGER, site=sitename)

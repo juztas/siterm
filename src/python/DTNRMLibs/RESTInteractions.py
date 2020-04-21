@@ -18,6 +18,7 @@ Email 			: justas.balcas (at) cern.ch
 @Copyright		: Copyright (C) 2016 California Institute of Technology
 Date			: 2017/09/26
 """
+from __future__ import print_function
 import urllib2
 import json
 import cgi
@@ -79,7 +80,7 @@ def get_json_post_form(environ):
     try:
         params = json.loads(request_body)
     except:
-        print 'Reached except in data load'
+        print('Reached except in data load')
         params = evaldict(request_body)
         if not isinstance(params, dict):
             params = json.loads(params)

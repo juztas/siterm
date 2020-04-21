@@ -18,6 +18,7 @@ Email 			: justas.balcas (at) cern.ch
 @Copyright		: Copyright (C) 2016 California Institute of Technology
 Date			: 2017/09/26
 """
+from __future__ import print_function
 import os
 import os.path
 import cgi
@@ -66,7 +67,7 @@ def getVal(conDict, **kwargs):
         else:
             raise Exception('This SiteName is not configured on the Frontend. Contact Support')
     else:
-        print kwargs
+        print(kwargs)
         raise Exception('This Call Should not happen. Contact Support')
 
 
@@ -123,9 +124,9 @@ def evaldict(inputDict):
     try:
         out = ast.literal_eval(str(inputDict).encode('utf-8'))
     except ValueError as ex:
-        print "Failed to literal eval dict. Err:%s " % ex
+        print("Failed to literal eval dict. Err:%s " % ex)
     except SyntaxError as ex:
-        print "Failed to literal eval dict. Err:%s " % ex
+        print("Failed to literal eval dict. Err:%s " % ex)
     return out
 
 
@@ -171,7 +172,7 @@ def createDirs(fullDirPath):
         try:
             os.makedirs(dirname)
         except OSError as ex:
-            print 'Received exception creating %s directory. Exception: %s' % (dirname, ex)
+            print('Received exception creating %s directory. Exception: %s' % (dirname, ex))
             if not os.path.isdir(dirname):
                 raise
     return
@@ -322,7 +323,7 @@ def getConfig(locations=None):
         return None
     for key, item in config['MAIN'].items():
         tmpCp.add_section(key)
-        print item, key
+        print(item, key)
         for key1, item1 in item.items():
             out = item1
             if isinstance(item1, list):
@@ -339,7 +340,7 @@ def getFileContentAsJson(inputFile):
             try:
                 out = json.load(fd)
             except ValueError:
-                print fd.seek(0)
+                print(fd.seek(0))
                 out = evaldict(fd.read())
     return out
 
@@ -401,14 +402,14 @@ def delete(inputObj, delObj):
         try:
             tmpList.remove(delObj)
         except ValueError as ex:
-            print 'Delete object %s is not in inputObj %s list. Err: %s' % (delObj, tmpList, ex)
+            print('Delete object %s is not in inputObj %s list. Err: %s' % (delObj, tmpList, ex))
         return tmpList
     elif isinstance(inputObj, dict):
         tmpDict = copy.deepcopy(inputObj)
         try:
             del tmpDict[delObj]
         except KeyError as ex:
-            print 'Delete object %s is not in inputObj %s dict. Err: %s' % (delObj, tmpList, ex)
+            print('Delete object %s is not in inputObj %s dict. Err: %s' % (delObj, tmpList, ex))
         return tmpDict
     # This should not happen
     raise WrongInputError('Provided input type is not available for deletion. Type %s' % type(inputObj))
@@ -425,7 +426,7 @@ def read_input_data(environ):
         outjson = json.loads(body.getvalue())
     except ValueError as ex:
         errMsg = 'Failed to parse json input: %s, Err: %s. Did caller used json.dumps?' % (body.getvalue(), ex)
-        print errMsg
+        print(errMsg)
         raise WrongInputError(errMsg)
     return outjson
 
@@ -494,7 +495,7 @@ def getUrlParams(environ, paramsList):
                                                (param['key'], outVals[0], param['options']))
         elif not outVals:
             outParams[param['key']] = param['default']
-    print outParams
+    print(outParams)
     return outParams
 
 

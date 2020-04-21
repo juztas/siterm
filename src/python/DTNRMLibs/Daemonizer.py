@@ -7,6 +7,7 @@ Changes applied to this code:
     Dedention (Justas Balcas 07/12/2017)
     pylint fixes: with open, split imports, var names, old style class (Justas Balcas 07/12/2017)
 """
+from __future__ import print_function
 import os
 import sys
 import time
@@ -38,7 +39,7 @@ class Daemon(object):
             if pid > 0:
                 # exit first parent
                 sys.exit(0)
-        except OSError, e:
+        except OSError as e:
             sys.stderr.write("fork #1 failed: %d (%s)\n" % (e.errno, e.strerror))
             sys.exit(1)
 
@@ -53,7 +54,7 @@ class Daemon(object):
             if pid > 0:
                 # exit from second parent
                 sys.exit(0)
-        except OSError, e:
+        except OSError as e:
             sys.stderr.write("fork #2 failed: %d (%s)\n" % (e.errno, e.strerror))
             sys.exit(1)
 
@@ -124,13 +125,13 @@ class Daemon(object):
             while 1:
                 os.kill(pid, SIGTERM)
                 time.sleep(0.1)
-        except OSError, err:
+        except OSError as err:
             err = str(err)
             if err.find("No such process") > 0:
                 if os.path.exists(self.pidfile):
                     os.remove(self.pidfile)
             else:
-                print str(err)
+                print(str(err))
                 sys.exit(1)
 
     def restart(self):
@@ -147,11 +148,11 @@ class Daemon(object):
         try:
             pidf = file(self.pidfile, 'r')
             pid = int(pidf.read().strip())
-            print 'Application info: PID %s' % pid
+            print('Application info: PID %s' % pid)
             pidf.close()
         except IOError:
             pid = None
-            print 'Is application running?'
+            print('Is application running?')
             sys.exit(1)
 
     def command(self, command, daemonName):
@@ -168,11 +169,11 @@ class Daemon(object):
             elif command == 'status':
                 self.status()
             else:
-                print "Unknown command"
+                print("Unknown command")
                 sys.exit(2)
             sys.exit(0)
         else:
-            print "usage: %s %s" % (daemonName, "|".join(self.availableCommands))
+            print("usage: %s %s" % (daemonName, "|".join(self.availableCommands)))
             sys.exit(2)
 
     def run(self):

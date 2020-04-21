@@ -19,6 +19,7 @@ Email 			: justas.balcas (at) cern.ch
 @Copyright		: Copyright (C) 2019 California Institute of Technology
 Date			: 2019/05/01
 """
+from __future__ import print_function
 
 import os
 import sqlite3
@@ -50,7 +51,7 @@ class DBBackend(object):
         """ Create database """
         for argname in dir(dbcalls):
             if argname.startswith('create_'):
-                print 'Call to create %s' % argname
+                print('Call to create %s' % argname)
                 self.cursor.execute(getattr(dbcalls, argname))
         self.conn.commit()
         self.destroy()
@@ -84,11 +85,11 @@ class DBBackend(object):
                 self.cursor.execute(query, item)
             self.conn.commit()
         except sqlite3.IntegrityError as ex:
-            print 'Record Already Exists. Ex: %s' % ex
+            print('Record Already Exists. Ex: %s' % ex)
             self.conn.rollback()
             raise ex
         except Exception as ex:
-            print 'Got Exception %s ' % ex
+            print('Got Exception %s ' % ex)
             self.conn.rollback()
             raise ex
         finally:
@@ -103,7 +104,7 @@ class DBBackend(object):
             self.cursor.execute(query)
             self.conn.commit()
         except Exception as ex:
-            print 'Got Exception %s ' % ex
+            print('Got Exception %s ' % ex)
             self.conn.rollback()
             raise ex
         finally:
@@ -122,7 +123,7 @@ class dbinterface(object):
         try:
             callquery = getattr(dbcalls, '%s_%s' % (callaction, calltype))
         except AttributeError as ex:
-            print 'Called %s_%s, but got exception %s' % (callaction, calltype, ex)
+            print('Called %s_%s, but got exception %s' % (callaction, calltype, ex))
             raise ex
         return callquery
 

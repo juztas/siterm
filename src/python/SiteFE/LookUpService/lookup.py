@@ -19,6 +19,7 @@ Email 			: justas.balcas (at) cern.ch
 @Copyright		: Copyright (C) 2016 California Institute of Technology
 Date			: 2017/09/26
 """
+from __future__ import print_function
 import os
 import tempfile
 import datetime
@@ -173,7 +174,7 @@ class LookUpService(object):
     def _deltaAddition(self, dbObj, delta, mainGraphName, updateState=True):
         delta['content'] = evaldict(delta['content'])
         self.logger.info('Working on %s delta addition in state' % delta['uid'])
-        print delta
+        print(delta)
         mainGraph = Graph()
         mainGraph.parse(mainGraphName, format='turtle')
         addition = delta['content']['addition']
@@ -244,7 +245,7 @@ class LookUpService(object):
         # ====================================
         # Define all prefixes
         for prefix, val in self.prefixDB.prefixes.items():
-            print prefix, val
+            print(prefix, val)
             self.newGraph.bind(prefix, val)
         now = datetime.datetime.now()
         saveDir = "%s/%s" % (self.config.get(self.sitename, "privatedir"), "LookUpService")
@@ -543,7 +544,7 @@ class LookUpService(object):
                         self.addIntfInfo(vlanDict, vlanuri, False)
         # Add Switch information to MRML
         for switchName, switchDict in switchInfo['switches'].items():
-            print switchName, switchDict
+            print(switchName, switchDict)
             for portName, portSwitch in switchDict.items():
                 newuri = ":%s:%s:%s" % (switchName, portName, portSwitch)
                 self.newGraph.add((self.prefixDB.genUriRef('site'),

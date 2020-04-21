@@ -18,16 +18,18 @@ Email 			: justas.balcas (at) cern.ch
 @Copyright		: Copyright (C) 2016 California Institute of Technology
 Date			: 2017/09/26
 """
+from __future__ import print_function
+from __future__ import absolute_import
 import os
 import glob
 import pprint
-from QOS import QOS
+from .QOS import QOS
 from DTNRMLibs.MainUtilities import getDataFromSiteFE, evaldict, getStreamLogger
 from DTNRMLibs.MainUtilities import createDirs, getFullUrl, contentDB, getFileContentAsJson
 from DTNRMLibs.MainUtilities import getLogger
 from DTNRMLibs.MainUtilities import getConfig
 from DTNRMLibs.CustomExceptions import FailedInterfaceCommand
-from Components.VInterfaces import VInterfaces
+from .Components.VInterfaces import VInterfaces
 
 
 COMPONENT = 'Ruler'
@@ -238,7 +240,7 @@ class Ruler(object):
                     self.setHostState('active', state['deltaid'])
                 else:
                     # TODO. Have ability to save message in Frontend.
-                    print 'we should change state to failed', outExit, message
+                    print('we should change state to failed', outExit, message)
                     self.logger.info('Adding resources failed. Setting Host State to Failed Exit: %s, Message %s'
                                      % (outExit, message))
                     self.setHostState('failed', state['deltaid'])

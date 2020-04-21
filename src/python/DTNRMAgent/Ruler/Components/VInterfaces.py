@@ -19,6 +19,7 @@ Email 			: justas.balcas (at) cern.ch
 @Copyright		: Copyright (C) 2016 California Institute of Technology
 Date			: 2017/09/26
 """
+from __future__ import print_function
 # TODO. Configure also MTU and txqueuelen
 import ipaddress
 from DTNRMLibs.MainUtilities import execute
@@ -130,4 +131,4 @@ class VInterfaces(object):
         return None
 
 if __name__ == '__main__':
-    print 'This has to be called through main Ruler component. Not supported direct call'
+    print('This has to be called through main Ruler component. Not supported direct call')

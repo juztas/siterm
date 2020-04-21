@@ -38,6 +38,7 @@ Email 			: justas.balcas (at) cern.ch
 @Copyright		: Copyright (C) 2016 California Institute of Technology
 Date			: 2017/09/26
 """
+from __future__ import print_function
 import re
 import json
 import importlib
@@ -143,7 +144,7 @@ def internallCall(caller, environ, **kwargs):
         kwargs['http_respond'].ret_500('application/json', kwargs['start_response'], None)
         returnDict = getCustomOutMsg(errMsg=ex.__str__(), errCode=500)
     if exception:
-        print exception
+        print(exception)
     return returnDict
 
 
@@ -158,7 +159,7 @@ def application(environ, start_response):
     certHandler = CertHandler()
     try:
         environ['CERTINFO'] = certHandler.getCertInfo(environ)
-        print environ['CERTINFO']
+        print(environ['CERTINFO'])
         certHandler.validateCertificate(environ)
     except Exception as ex:
         httpResponder.ret_401('application/json', start_response, None)
@@ -192,9 +193,9 @@ def application(environ, start_response):
                                                  urlParams=getUrlParams(environ, params),
                                                  headers=headers, sitename=sitename))]
             except (NotSupportedArgument, TooManyArgumentalValues) as ex:
-                print 'Send 400 error. More details: %s' % json.dumps(getCustomOutMsg(errMsg=ex.__str__(), errCode=400))
+                print('Send 400 error. More details: %s' % json.dumps(getCustomOutMsg(errMsg=ex.__str__(), errCode=400)))
                 httpResponder.ret_400('application/json', start_response, None)
                 return [json.dumps(getCustomOutMsg(errMsg=ex.__str__(), errCode=400))]
-    print 'Send 501 error. More details: %s' % json.dumps(getCustomOutMsg(errMsg="Such API does not exist. Not Implemented", errCode=501))
+    print('Send 501 error. More details: %s' % json.dumps(getCustomOutMsg(errMsg="Such API does not exist. Not Implemented", errCode=501)))
     httpResponder.ret_501('application/json', start_response, [('Location', '/')])
     return [json.dumps(getCustomOutMsg(errMsg="Such API does not exist. Not Implemented", errCode=501))]
