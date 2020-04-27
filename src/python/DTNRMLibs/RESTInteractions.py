@@ -19,7 +19,14 @@ Email 			: justas.balcas (at) cern.ch
 Date			: 2017/09/26
 """
 from __future__ import print_function
-import urllib2
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
+from builtins import object
+import urllib.request, urllib.error, urllib.parse
 import json
 import cgi
 from DTNRMLibs.CustomExceptions import NotFoundError
@@ -37,11 +44,11 @@ class getContent(object):
     def get_method(self, url):
         """Only used inside the site for forwardning requests..."""
         try:
-            req = urllib2.Request(url)
-            response = urllib2.urlopen(req)
+            req = urllib.request.Request(url)
+            response = urllib.request.urlopen(req)
             thePage = response.read()
             return thePage
-        except urllib2.HTTPError as ex:
+        except urllib.error.HTTPError as ex:
             if ex.code == 404:
                 raise NotFoundError
             else:
@@ -85,7 +92,7 @@ def get_json_post_form(environ):
         if not isinstance(params, dict):
             params = json.loads(params)
     environ.setdefault('params', {})
-    for key in params.keys():
+    for key in list(params.keys()):
         environ['params'][key] = params[key]
     return environ['params']
 

@@ -1,0 +1,6 @@
+rdflib==4.2.2
+importlib==1.0.4
+setuptools==39.1.0
+python-dateutil==2.7.5
+pyaml
+requests

@@ -1,5 +1,13 @@
 #!/usr/bin/env python
 """ Change delta state to activating """
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import *
 import sys
 import tempfile
 import ast
@@ -64,7 +72,7 @@ def getdeltainfo(sitename, deltaUID):
         for deltatimes in dbobj.get('states', search=[['deltaid', delta['uid']]]):
             LOGGER.info('State: %s Date: %s', deltatimes['state'], deltatimes['insertdate'])
         if delta['deltat'] in ['reduction', 'addition']:
-            for hostname in delta[delta['deltat']]['hosts'].keys():
+            for hostname in list(delta[delta['deltat']]['hosts'].keys()):
                 LOGGER.info('-' * 20)
                 LOGGER.info('Host States %s', hostname)
                 for hoststate in dbobj.get('hoststates', search=[['deltaid', delta['uid']], ['hostname', hostname]]):

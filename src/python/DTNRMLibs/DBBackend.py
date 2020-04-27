@@ -20,7 +20,15 @@ Email 			: justas.balcas (at) cern.ch
 Date			: 2019/05/01
 """
 from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import zip
+from builtins import *
+from builtins import object
 import os
 import sqlite3
 import DTNRMLibs.dbcalls as dbcalls
@@ -155,7 +163,7 @@ class dbinterface(object):
         out = []
         if mapping:
             for item in dbout[1]:
-                out.append(dict(zip(dbout[0], list(item))))
+                out.append(dict(list(zip(dbout[0], list(item)))))
             return out
         return dbout
 

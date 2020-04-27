@@ -19,6 +19,14 @@ Email 			: justas.balcas (at) cern.ch
 Date			: 2017/09/26
 """
 from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import *
+from builtins import object
 import os
 import sys
 import tempfile
@@ -47,7 +55,7 @@ def getError(ex):
               ValueError: -5, BadSyntax: -6, HostNotFound: -7, UnrecognizedDeltaOption: -8}
     errType = 'Unrecognized'
     errNo = '-100'
-    if ex.__class__ in errors.keys():
+    if ex.__class__ in list(errors.keys()):
         errType = str(ex.__class__)
         errNo = str(errors[ex.__class__])
     return {"errorType": errType,
@@ -57,7 +65,7 @@ def getError(ex):
 
 def getConnInfo(bidPort, prefixSite, output, nostore=False):
     """ Get Connection Info. Mainly ports. """
-    nName = filter(None, bidPort[len(prefixSite):].split(':'))
+    nName = [_f for _f in bidPort[len(prefixSite):].split(':') if _f]
     print(nName)
     if nostore:
         return nName[2], output
@@ -68,7 +76,7 @@ def getConnInfo(bidPort, prefixSite, output, nostore=False):
     if len(nName) == 5:
         output['hosts'][nName[2]]['destport'] = nName[3]
     elif len(nName[-1].split('.')) == 2:
-        if 'destport' not in output[nName[2]].keys():
+        if 'destport' not in list(output[nName[2]].keys()):
             output['hosts'][nName[2]]['destport'] = nName[-1].split('.')[0]
     return nName[2], output
 
@@ -120,7 +128,7 @@ class PolicyService(object):
                 except:
                     continue
                 times[timev] = temptime
-            if len(times.keys()) == 2:
+            if len(list(times.keys())) == 2:
                 return times
         return {}
 
@@ -148,7 +156,7 @@ class PolicyService(object):
         """ Parse Layer 3 Delta Request """
         del inFileName, sitename
         outall = {'hosts': {}}
-        for hostname in allKnownHosts.keys():
+        for hostname in list(allKnownHosts.keys()):
             connectionID = None
             outall['hosts'].setdefault(hostname, {})
             prefixes['mainrst'] = URIRef("%s:%s:service+rst" % (prefixes['site'], hostname))
@@ -215,7 +223,7 @@ class PolicyService(object):
         output['labelSwapping'] = str(out[0])
         out = self.queryGraph(gIn, connectionID, search=URIRef('%s%s' % (prefixes['nml'], 'existsDuring')))
         out = self.getTimeScheduling(out, gIn, prefixes)
-        if len(out.keys()) == 2:
+        if len(list(out.keys())) == 2:
             output['timestart'] = out['start']
             output['timeend'] = out['end']
         # =======================================================
@@ -224,7 +232,7 @@ class PolicyService(object):
         for bidPort in bidPorts:
             # Get first which labels it has. # This provides us info about vlan tag
             connInfo, output = getConnInfo(bidPort, prefixes['site'], output, nostore=True)
-            print(connInfo, allKnownHosts.keys())
+            print(connInfo, list(allKnownHosts.keys()))
             if connInfo not in allKnownHosts:
                 print('Ignore %s' % connInfo)
                 continue
@@ -311,7 +319,7 @@ class PolicyService(object):
                 BadSyntax, HostNotFound, UnrecognizedDeltaOption) as ex:
             outputDict = getError(ex)
         dbobj = getVal(self.dbI, sitename=sitename)
-        if 'errorType' in outputDict.keys():
+        if 'errorType' in list(outputDict.keys()):
             toDict["State"] = "failed"
             toDict["Error"] = outputDict
             toDict['ParsedDelta'] = {'addition': '', 'reduction': ''}
@@ -330,7 +338,7 @@ class PolicyService(object):
                 print(outputDict)
                 connID = outputDict[key]['connectionID']
                 if key == 'reduction':
-                    if "ReductionID" not in outputDict.keys():
+                    if "ReductionID" not in list(outputDict.keys()):
                         self.logger.info('Trying to identify which to delete')
                         reductionIDMap = self.reductionCompare(sitename, outputDict[key]['connectionID'])
                         toDict["ReductionID"] = reductionIDMap

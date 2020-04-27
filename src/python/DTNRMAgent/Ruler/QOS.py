@@ -18,6 +18,15 @@ Email 			: justas.balcas (at) cern.ch
 @Copyright		: Copyright (C) 2016 California Institute of Technology
 Date			: 2017/09/26
 """
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
+from builtins import object
+from past.utils import old_div
 import os
 import glob
 import json
@@ -49,13 +58,13 @@ def convertToRate(inputRate, inputVal, logger):
     outRate = -1
     outType = ''
     if inputRate == 'bps':
-        outRate = int(inputVal / 1000000000)
+        outRate = int(old_div(inputVal, 1000000000))
         outType = 'gbit'
     if outRate == 0:
-        outRate = int(inputVal / 1000000)
+        outRate = int(old_div(inputVal, 1000000))
         outType = 'mbit'
     if outRate == 0:
-        outRate = int(inputVal / 1000)
+        outRate = int(old_div(inputVal, 1000))
         outType = 'bit'
     if outRate != -1:
         logger.info('Converted rate for QoS from %s %s to %s' % (inputRate, inputVal, outRate))
@@ -107,13 +116,13 @@ class QOS(object):
             inputDict = {}
             with open(fileName, 'r') as fd:
                 inputDict = json.load(fd)
-                if 'uid' not in inputDict.keys():
+                if 'uid' not in list(inputDict.keys()):
                     self.logger.info('Seems this dictionary is custom delta. Ignoring it.')
                     continue
                 inputDict = inputDict[u'hosts'][self.hostname]
                 # ['hosts'][self.hostname]
                 self.logger.info("File %s content %s" % (fileName, inputDict))
-                if 'routes' in inputDict.keys():
+                if 'routes' in list(inputDict.keys()):
                     self.logger.info('This is L3 definition. Ignore QOS. Todo for future based on source/dest')
                     continue
                 inputName = "%s%sIn" % (inputDict['destport'], inputDict['vlan'])

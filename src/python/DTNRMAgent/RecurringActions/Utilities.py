@@ -17,6 +17,13 @@ Email 			: justas.balcas (at) cern.ch
 @Copyright		: Copyright (C) 2016 California Institute of Technology
 Date			: 2017/09/26
 """
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import subprocess
 import shlex
 import psutil
@@ -86,7 +93,7 @@ def getProcInfo(procID):
     procOutInfo['MemUseInfo']['Swap'] = memInfo.swap
     procOutInfo['Connections'] = {}
     for item in procS.connections():
-        if item.status not in procOutInfo['Connections'].keys():
+        if item.status not in list(procOutInfo['Connections'].keys()):
             procOutInfo['Connections'][item.status] = 0
         procOutInfo['Connections'][item.status] += 1
     return procOutInfo

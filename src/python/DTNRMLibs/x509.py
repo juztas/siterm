@@ -19,6 +19,14 @@ Email                   : justas.balcas (at) cern.ch
 Date                    : 2019/10/01
 """
 from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import *
+from builtins import object
 import time
 from datetime import datetime
 from OpenSSL import crypto
@@ -34,7 +42,7 @@ class CertHandler(object):
     def loadAuthorized(self):
         """ Load all authorized users for FE from git """
         config = getGitConfig()
-        for user, userinfo in config['AUTH'].items():
+        for user, userinfo in list(config['AUTH'].items()):
             self.allowedCerts.setdefault(userinfo['full_dn'], {})
             self.allowedCerts[userinfo['full_dn']]['username'] = user
             self.allowedCerts[userinfo['full_dn']]['permissions'] = userinfo['permissions']
@@ -61,7 +69,7 @@ class CertHandler(object):
         if 'CERTINFO' not in environ:
             raise Exception('Certificate not found. Unauthorized')
         for key in ['subject', 'notAfter', 'notBefore', 'issuer', 'fullDN']:
-            if key not in environ['CERTINFO'].keys():
+            if key not in list(environ['CERTINFO'].keys()):
                 print('%s not available in certificate retrieval' % key)
                 raise Exception('Unauthorized access')
         # Check time before
@@ -73,7 +81,7 @@ class CertHandler(object):
             print('Certificate Invalid. Current Timestamp: %s NotAfter: %s' % (timestamp, environ['CERTINFO']['notAfter']))
             raise Exception('Certificate Invalid')
         # Check DN in authorized list
-        if environ['CERTINFO']['fullDN'] not in self.allowedCerts.keys():
+        if environ['CERTINFO']['fullDN'] not in list(self.allowedCerts.keys()):
             print('User DN %s is not in authorized list' % environ['CERTINFO']['fullDN'])
             raise Exception('Unauthorized access')
         return self.allowedCerts[environ['CERTINFO']['fullDN']]

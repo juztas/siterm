@@ -1,6 +1,13 @@
 #!/usr/bin/env python
 """Print delta information """
 from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import *
 import sys
 import tempfile
 import ast
@@ -42,7 +49,7 @@ def getdeltaAll(sitename, deltaUID):
         for deltatimes in dbobj.get('states', search=[['deltaid', delta['uid']]]):
             print('State: %s Date: %s' % (deltatimes['state'], deltatimes['insertdate']))
         if delta['deltat'] in ['reduction', 'addition']:
-            for hostname in delta[delta['deltat']]['hosts'].keys():
+            for hostname in list(delta[delta['deltat']]['hosts'].keys()):
                 print('-' * 20)
                 print('Host States %s' % hostname)
                 for hoststate in dbobj.get('hoststates', search=[['deltaid', delta['uid']], ['hostname', hostname]]):
@@ -55,7 +62,7 @@ def getdeltaAll(sitename, deltaUID):
         toDict = ast.literal_eval(str(delta['content']))
         jOut = getAllHosts(sitename, LOGGER)
         for key in ['reduction', 'addition']:
-            print(toDict.keys())
+            print(list(toDict.keys()))
             if key in toDict and toDict[key]:
                 print('Got Content %s for key %s', toDict[key], key)
                 tmpFile = tempfile.NamedTemporaryFile(delete=False)

@@ -18,13 +18,21 @@ Email 			: justas.balcas (at) cern.ch
 @Copyright		: Copyright (C) 2016 California Institute of Technology
 Date			: 2017/09/26
 """
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
 
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
+from builtins import object
 def exceptionCode(excName):
     """ Return Exception code. Mainly used by DTN-RM Agent """
     exCodes = {IOError: -1, KeyError: -2, AttributeError: -3, IndentationError: -4,
                ValueError: -5, PluginException: -6, NameError: -7}
-    if excName in exCodes.keys():
+    if excName in list(exCodes.keys()):
         return exCodes[excName]
     return -100
 

@@ -19,6 +19,14 @@ Email 			: justas.balcas (at) cern.ch
 Date			: 2017/09/26
 """
 from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import *
+from builtins import object
 import importlib
 import time
 from DTNRMLibs.MainUtilities import evaldict
@@ -70,7 +78,7 @@ class ProvisioningService(object):
         for stateChange in [{"accepting": "accepted"}, {"accepted": "committing"},
                             {"committing": "committed"}, {"committed": "activating"},
                             {"activating": "active"}, {"active": "remove"}, {"cancel": "remove"}]:
-            if deltaState == stateChange.keys()[0]:
+            if deltaState == list(stateChange.keys())[0]:
                 msg = 'Delta State %s and performing action to %s' % (deltaState, stateChange[deltaState])
                 self.logger.debug(msg)
                 switchruler.mainCall(deltaState, newvlan, 'remove')
@@ -85,7 +93,7 @@ class ProvisioningService(object):
         deltaState = newDelta['HOSTSTATE']
         for stateChange in [{"accepting": "accepted"}, {"accepted": "committing"},
                             {"committing": "committed"}, {"committed": "activating"}, {"activating": "active"}]:
-            if deltaState == stateChange.keys()[0]:
+            if deltaState == list(stateChange.keys())[0]:
                 print('Delta State %s and performing action to %s' % (deltaState, stateChange[deltaState]))
                 switchruler.mainCall(deltaState, newvlan, 'add')
                 self.pushInternalAction(fullURL, stateChange[deltaState], deltaID, switchName)
@@ -103,7 +111,7 @@ class ProvisioningService(object):
     def checkdeltas(self, switchHostname, inJson):
         """Check which ones are assigned to any of switch"""
         newDeltas = []
-        if switchHostname in inJson['HostnameIDs'].keys():
+        if switchHostname in list(inJson['HostnameIDs'].keys()):
             for delta in inJson['HostnameIDs'][switchHostname]:
                 # print delta, self.hostname, inJson['ID'][delta]['State']
                 # 1) Filter out all which are not relevant.
@@ -133,8 +141,8 @@ class ProvisioningService(object):
         out = []
         if not switches:
             return out
-        for _, switchPort in switches['vlans'].items():
-            for _, portDict in switchPort.items():
+        for _, switchPort in list(switches['vlans'].items()):
+            for _, portDict in list(switchPort.items()):
                 if 'isAlias' in portDict:
                     tmp = portDict['isAlias'].split(':')[-3:]
                     out.append(tmp[0])
@@ -167,7 +175,7 @@ class ProvisioningService(object):
         alliases = self.getAllAliases(switches)
         outputDict = {}
         allDeltas = self.getData(fullURL, "/sitefe/v1/deltas?oldview=true")
-        for switchName in list(switches['switches'].keys() + alliases):
+        for switchName in list(list(switches['switches'].keys()) + alliases):
             print(switchName)
             newDeltas = self.checkdeltas(switchName, allDeltas)
             for newDelta in newDeltas:

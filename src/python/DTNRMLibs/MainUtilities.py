@@ -19,6 +19,15 @@ Email 			: justas.balcas (at) cern.ch
 Date			: 2017/09/26
 """
 from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from past.builtins import basestring
+from builtins import *
+from builtins import object
 import os
 import os.path
 import cgi
@@ -30,13 +39,13 @@ import shlex
 import uuid
 import json
 import copy
-import httplib
+import http.client
 import base64
 import datetime
 import subprocess
 import email.utils as eut
-import ConfigParser
-from cStringIO import StringIO
+import configparser
+from io import StringIO
 import logging
 from logging import StreamHandler
 from logging.handlers import TimedRotatingFileHandler
@@ -61,8 +70,8 @@ def getUTCnow():
 
 def getVal(conDict, **kwargs):
     """ Get value from configuration """
-    if 'sitename' in kwargs.keys():
-        if kwargs['sitename'] in conDict.keys():
+    if 'sitename' in list(kwargs.keys()):
+        if kwargs['sitename'] in list(conDict.keys()):
             return conDict[kwargs['sitename']]
         else:
             raise Exception('This SiteName is not configured on the Frontend. Contact Support')
@@ -183,7 +192,7 @@ def publishToSiteFE(inputDict, host, url):
     req = Requests(host, {})
     try:
         out = req.makeRequest(url, verb='PUT', data=json.dumps(inputDict))
-    except httplib.HTTPException as ex:
+    except http.client.HTTPException as ex:
         return (ex.message, ex.status, 'FAILED', True)
     except pycurl.error as ex:
         return (ex.args[1], ex.args[0], 'FAILED', False)
@@ -195,7 +204,7 @@ def getDataFromSiteFE(inputDict, host, url):
     req = Requests(host, {})
     try:
         out = req.makeRequest(url, verb='GET', data=inputDict)
-    except httplib.HTTPException as ex:
+    except http.client.HTTPException as ex:
         return (ex.message, ex.status, 'FAILED', True)
     except pycurl.error as ex:
         return (ex.args[1], ex.args[0], 'FAILED', False)
@@ -257,8 +266,8 @@ class GitConfig(object):
             raise Exception('Config file /etc/dtnrm.yaml does not exist.')
         with open('/etc/dtnrm.yaml', 'r') as fd:
             self.config = yload(fd.read())
-        for key, requirement in self.defaults.items():
-            if key not in self.config.keys():
+        for key, requirement in list(self.defaults.items()):
+            if key not in list(self.config.keys()):
                 # Check if it is optional or not;
                 if not requirement['optional']:
                     self.logger.debug('Configuration /etc/dtnrm.yaml missing non optional config parameter %s', key)
@@ -293,7 +302,7 @@ class GitConfig(object):
             self.getLocalConfig()
         url = "%s/mapping.yaml" % self.getFullGitUrl()
         mapping = self._gitConfigCache('mapping', url)
-        if self.config['MD5'] not in mapping.keys():
+        if self.config['MD5'] not in list(mapping.keys()):
             msg = 'Configuration is not available for this MD5 %s tag in GIT REPO %s' % \
                             (self.config['MD5'], self.config['GIT_REPO'])
             self.logger.debug(msg)
@@ -317,14 +326,14 @@ def getConfig(locations=None):
     """
     del locations
     config = getGitConfig()
-    tmpCp = ConfigParser.ConfigParser()
+    tmpCp = configparser.ConfigParser()
     if not isinstance(config, dict):
         print('ERROR: Config from Git returned not dictionary. Malformed yaml?')
         return None
-    for key, item in config['MAIN'].items():
+    for key, item in list(config['MAIN'].items()):
         tmpCp.add_section(key)
         print(item, key)
-        for key1, item1 in item.items():
+        for key1, item1 in list(item.items()):
             out = item1
             if isinstance(item1, list):
                 out = ",".join(item1)
@@ -502,7 +511,7 @@ def getUrlParams(environ, paramsList):
 def getHeaders(environ):
     """ Get all Headers and return them back as dictionary """
     headers = {}
-    for key in environ.keys():
+    for key in list(environ.keys()):
         if key.startswith('HTTP_'):
             headers[key[5:]] = environ.get(key)
     return headers

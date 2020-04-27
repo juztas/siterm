@@ -37,16 +37,26 @@ for row in data:
     print(row)
 """
 from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
 
 # system modules
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
+from past.builtins import basestring
+from builtins import *
+from builtins import object
 import os
 import re
 import sys
-import cStringIO as StringIO
-import httplib
+import io as StringIO
+import http.client
 import json
 import logging
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import subprocess
 # 3d-party libraries
 import pycurl
@@ -116,7 +126,7 @@ class RequestHandler(object):
         # data is not encoded, we need to do that
         if verb in ['GET', 'HEAD']:
             if params:
-                encoded_data = urllib.urlencode(params, doseq=doseq)
+                encoded_data = urllib.parse.urlencode(params, doseq=doseq)
             else:
                 return ''
         else:
@@ -168,7 +178,7 @@ class RequestHandler(object):
         curl.setopt(pycurl.URL, str(url))
         if headers:
             curl.setopt(pycurl.HTTPHEADER,
-                        ["%s: %s" % (k, v) for k, v in headers.items()])
+                        ["%s: %s" % (k, v) for k, v in list(headers.items())])
         bbuf = StringIO.StringIO()
         hbuf = StringIO.StringIO()
         curl.setopt(pycurl.WRITEFUNCTION, bbuf.write)
@@ -234,7 +244,7 @@ class RequestHandler(object):
         else:
             data = bbuf.getvalue()
             msg = 'url=%s, code=%s, reason=%s, headers=%s' % (url, header.status, header.reason, header.header)
-            exc = httplib.HTTPException(msg)
+            exc = http.client.HTTPException(msg)
             setattr(exc, 'req_data', params)
             setattr(exc, 'req_headers', headers)
             setattr(exc, 'url', url)
@@ -356,14 +366,14 @@ def getdata(urls, ckey, cert, headers=None, options=None, num_conn=100, cookie=N
     for _ in range(num_conn):
         curl = pycurl.Curl()
         curl.fp = None
-        for key, val in options.items():
+        for key, val in list(options.items()):
             curl.setopt(getattr(pycurl, key), val)
         curl.setopt(pycurl.SSLKEY, ckey)
         curl.setopt(pycurl.SSLCERT, cert)
         mcurl.handles.append(curl)
         if headers:
             curl.setopt(pycurl.HTTPHEADER,
-                        ["%s: %s" % (k, v) for k, v in headers.items()])
+                        ["%s: %s" % (k, v) for k, v in list(headers.items())])
 
     # Main loop
     freelist = mcurl.handles[:]

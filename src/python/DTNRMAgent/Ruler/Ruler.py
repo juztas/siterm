@@ -20,6 +20,13 @@ Date			: 2017/09/26
 """
 from __future__ import print_function
 from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import division
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import *
+from builtins import object
 import os
 import glob
 import pprint
@@ -84,7 +91,7 @@ class Ruler(object):
 
     def vlanCheck(self, addition):
         """ vlan parameters check and append """
-        if 'MTU' not in addition['hosts'][self.hostname].keys():
+        if 'MTU' not in list(addition['hosts'][self.hostname].keys()):
             addition['hosts'][self.hostname]['MTU'] = 9000
         if 'txqueuelen' not in addition['hosts'][self.hostname]:
             addition['hosts'][self.hostname]['txqueuelen'] = 10000
@@ -120,7 +127,7 @@ class Ruler(object):
                 self.vInterface.remove(addition['hosts'][self.hostname])
             os.unlink(newvlanFile)
             # return True, "This delta was already on the system. Cancel it."
-        if self.hostname not in addition['hosts'].keys():
+        if self.hostname not in list(addition['hosts'].keys()):
             return False, "Failed to find own hostname in dictionary"
         addition = self.vlanCheck(addition)
         self.logger.info("Saving file %s", deltaID)
@@ -176,7 +183,7 @@ class Ruler(object):
         # THIS IS TODO
         for fileName in glob.glob("%s/*.json" % self.workDir):
             inputDict = getFileContentAsJson(fileName)
-            if 'uid' not in inputDict.keys():
+            if 'uid' not in list(inputDict.keys()):
                 self.logger.info('Seems this dictionary is custom delta. Ignoring it.')
                 continue
             deltaInfo = self.getDeltaInfo(inputDict['uid'])

@@ -1,6 +1,12 @@
 #!/usr/bin/env python
 """ List all deltas inFrontend """
 from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import sys
 from DTNRMLibs.MainUtilities import getVal
 from DTNRMLibs.MainUtilities import evaldict
@@ -37,10 +43,10 @@ def getdeltaAll(sitename):
         if delta['deltat'] not in ['reduction', 'addition']:
             print('SOMETHING WRONG WITH THIS DELTA. It does not have any type defined. Was not parsed properly')
             continue
-        if 'hosts' not in delta[delta['deltat']].keys():
+        if 'hosts' not in list(delta[delta['deltat']].keys()):
             print('SOMETHING WRONG WITH THIS DELTA. It does not have any hosts defined.')
             continue
-        for hostname in delta[delta['deltat']]['hosts'].keys():
+        for hostname in list(delta[delta['deltat']]['hosts'].keys()):
             print('-'*20)
             print('Host States %s' % hostname)
             for hoststate in dbobj.get('hoststates', search=[['deltaid', delta['uid']], ['hostname', hostname]]):
