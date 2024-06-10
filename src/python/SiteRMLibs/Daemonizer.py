@@ -19,7 +19,7 @@ from SiteRMLibs import __version__ as runningVersion
 from SiteRMLibs.MainUtilities import (
     getDataFromSiteFE, getDBConn, getFullUrl, getHostname,
     getLoggingObject, getUTCnow, getVal, publishToSiteFE,
-    reCacheConfig, contentDB, createDirs
+    contentDB, createDirs
 )
 from SiteRMLibs.GitConfig import getGitConfig
 
@@ -424,8 +424,7 @@ class Daemon(DBBackend):
     def run(self):
         """Run main execution"""
         # pylint: disable=W0702
-        houreq, dayeq, currentHour, currentDay = reCacheConfig(None, None)
-        self.refreshThreads(houreq, dayeq)
+        self.refreshThreads(False, False)
         while self.runLoop():
             self.runCount += 1
             hadFailure = False
@@ -462,16 +461,11 @@ class Daemon(DBBackend):
             if self.timeToExit():
                 self.logger.info('Total Runtime expired. Stopping Service')
                 sys.exit(0)
-            houreq, dayeq, currentHour, currentDay = reCacheConfig(currentHour, currentDay)
-            if not houreq:
-                self.logger.info('Re-initiating Service with new configuration from GIT')
-                self._refreshConfig()
-                self.refreshThreads(houreq, dayeq)
             elif refresh:
                 self.logger.info('Re-initiating Service with new configuration from GIT. Forced by DB')
                 self.cleaner()
                 self._refreshConfig()
-                self.refreshThreads(houreq, dayeq)
+                self.refreshThreads(False, False)
 
     @staticmethod
     def getThreads(_houreq, _dayeq):

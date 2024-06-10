@@ -8,7 +8,7 @@ Authors:
 Date: 2022/05/19
 """
 import os
-from SiteRMLibs.MainUtilities import getLoggingObject
+from SiteRMLibs.MainUtilities import getLoggingObject, createDirs
 from SiteRMLibs.GitConfig import getGitConfig
 from SiteRMLibs.Backends.main import Switch
 
@@ -18,6 +18,7 @@ class SwitchWorker():
         self.config = config
         self.sitename = sitename
         self.device = device
+        createDirs(f"{self.config.get(self.sitename, 'privatedir')}/SwitchWorker/")
         self.logger = getLoggingObject(config=self.config, service="SwitchWorker")
         self.switch = Switch(config, sitename)
         self.config = None

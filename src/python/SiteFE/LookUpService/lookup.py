@@ -41,6 +41,8 @@ class MultiWorker():
         self.sitename = sitename
         self.logger = logger
         self.firstRun = True
+        self.dorestart = False
+
 
     def _runCmd(self, action, device, foreground=False):
         """Start execution of new requests"""
@@ -58,6 +60,9 @@ class MultiWorker():
     def startwork(self):
         """Multiworker main process"""
         self.logger.info("Started MultiWorker work to check switch processes")
+        if not self.firstRun and self.dorestart:
+            self.startrestart()
+            return
         restarted = False
         for siteName in self.config.get("general", "sites"):
             for dev in self.config.get(siteName, "switch"):
@@ -81,6 +86,24 @@ class MultiWorker():
             time.sleep(60)
         self.firstRun = False
 
+    def restart(self):
+        """Restart all SwitchWorkers"""
+        self.dorestart = False
+        self.firstRun = False
+        self.logger.info("Restart MultiWorker work to check switch processes")
+        for siteName in self.config.get("general", "sites"):
+            for dev in self.config.get(siteName, "switch"):
+                # Check status
+                retOut = self._runCmd('status', dev)
+                if retOut['exitCode'] != 0:
+                    self.logger.info(f"Starting SwitchWorker for {dev}")
+                    retOut = self._runCmd('start', dev, True)
+                    self.logger.info(f"Starting SwitchWorker for {dev} - {retOut}")
+                elif retOut['exitCode'] == 0:
+                    self.logger.info(f"Resarting SwitchWorker for {dev}")
+                    retOut = self._runCmd('restart', dev, True)
+                    self.logger.info(f"Restarting SwitchWorker for {dev} - {retOut}")
+
 
 class LookUpService(SwitchInfo, NodeInfo, DeltaInfo, RDFHelper, BWService, Timing):
     """Lookup Service prepares MRML model about the system."""
@@ -89,9 +112,7 @@ class LookUpService(SwitchInfo, NodeInfo, DeltaInfo, RDFHelper, BWService, Timin
         self.sitename = sitename
         self.config = config
         self.logger = getLoggingObject(config=self.config, service="LookUpService")
-        self.dbI = getVal(
-            getDBConn("LookUpService", self), **{"sitename": self.sitename}
-        )
+        self.dbI = getVal(getDBConn("LookUpService", self), **{"sitename": self.sitename})
         self.newGraph = None
         self.shared = "notshared"
         self.hosts = {}
@@ -107,8 +128,7 @@ class LookUpService(SwitchInfo, NodeInfo, DeltaInfo, RDFHelper, BWService, Timin
         self.stopThread = False
         self.threads = threading.Thread(target=self._dbthread)
         self.threads.start()
-        for dirname in ['LookUpService', 'SwitchWorker']:
-            createDirs(f"{self.config.get(self.sitename, 'privatedir')}/{dirname}/")
+        createDirs(f"{self.config.get(self.sitename, 'privatedir')}/LookUpService/")
         self.firstRun = True
 
     def refreshthread(self, *args):
@@ -129,6 +149,7 @@ class LookUpService(SwitchInfo, NodeInfo, DeltaInfo, RDFHelper, BWService, Timin
         self.threads = threading.Thread(target=self._dbthread)
         self.threads.start()
         self.stopThread = False
+        self.multiworker.dorestart = True
 
     def _dbthread(self):
         """Database thread worker - to change delta states"""
