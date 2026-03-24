@@ -11,9 +11,9 @@ Host DSCP at Layer 2:
 This configuration below uses Linux tc (traffic control) with u32 classifiers and pedit actions to rewrite the DSCP field for all traffic on vlan.1409.
 Three classes are enforced:
 
-    GuaranteedCapped → DSCP 46 (0x2E, encoded as 0xB8 in IPv4 TOS)
-    SoftCapped → DSCP 18 (0x12, encoded as 0x48 in IPv4 TOS)
-    BestEffort → DSCP 0
+    GuaranteedCapped -> DSCP 46 (0x2E, encoded as 0xB8 in IPv4 TOS)
+    SoftCapped -> DSCP 18 (0x12, encoded as 0x48 in IPv4 TOS)
+    BestEffort -> DSCP 0
 
 Because IPv4 and IPv6 store DSCP in different spots, each class has two filters: one for IPv4 and one for IPv6.
 
@@ -58,7 +58,7 @@ class DSCP:
     def __init__(self):
         self._ip6tables_avail = bool(shutil.which("ip6tables"))
 
-    # ── active-delta helpers ───────────────────────────────────────────────────
+    # active-delta helpers
 
     def _get_active_l2_dscp(self, activeDeltas):
         """Return {dev: entry} for every vlan interface with a DSCP service class."""
@@ -102,7 +102,7 @@ class DSCP:
                         result.append({"dst_ipv6": dst, "svc_type": svc_type, "uuid": uuid})
         return result
 
-    # ── L2: tc qdisc / filter helpers ─────────────────────────────────────────
+    # L2: tc qdisc / filter helpers 
 
     def _has_root_prio(self, dev):
         """Return True if dev already has a root prio qdisc."""
@@ -144,7 +144,7 @@ class DSCP:
         """Remove root prio qdisc (and all attached filters) from dev."""
         execute(f"tc qdisc del dev {dev} root", self.logger, raiseError=False)
 
-    # ── L3: ip6tables helpers ──────────────────────────────────────────────────
+    # L3: ip6tables helpers
 
     @staticmethod
     def _ip6t_comment(svc_type, uuid):
@@ -185,11 +185,11 @@ class DSCP:
             raiseError=False,
         )
 
-    # ── main convergence ───────────────────────────────────────────────────────
+    # main convergence
 
     def startdscp(self):
         """Converge DSCP rules: apply desired state from activeFromFE, remove stale rules."""
-        # L2 ──────────────────────────────────────────────────────────────────
+        # L2
         desired_l2 = self._get_active_l2_dscp(self.activeFromFE)
         previous_l2 = self._get_active_l2_dscp(self.activeDeltas)
 
@@ -204,7 +204,7 @@ class DSCP:
             self._clear_dscp_filters(dev)
             self._apply_l2_dscp(dev, entry["svc_type"])
 
-        # L3 ──────────────────────────────────────────────────────────────────
+        # L3
         if not self._ip6tables_avail:
             self.logger.info("DSCP: ip6tables not found, skipping L3 rules")
             return
